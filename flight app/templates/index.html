@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}SkyRoute — Find Flights{% endblock %}
+
+{% block extra_style %}
+.hero {
+    padding: 4rem 2rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.hero-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+}
+
+h1 em {
+    font-style: normal;
+    color: var(--accent);
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 1.05rem;
+    font-weight: 300;
+    margin-bottom: 3rem;
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+.search-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 2.5rem;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+}
+
+.search-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+.form-group.date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+input, select {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--paper);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(10,10,15,0.08);
+}
+
+.select-wrap {
+    position: relative;
+}
+
+.select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 0.85rem;
+}
+
+.form-footer {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.error-msg {
+    background: #fef2f0;
+    border: 1px solid #f5c6bb;
+    color: #c0392b;
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.airports-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.airport-pill {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+.airport-pill b {
+    color: var(--ink);
+}
+
+@media(max-width:600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.date-row { grid-template-columns: 1fr; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-tag">✈ Flight Search</div>
+    <h1>Find your next<br><em>destination.</em></h1>
+    <p class="subtitle">Search flights between airports across our network. Select your route and dates to get started.</p>
+
+    <div class="search-card">
+        <h2>Search Flights</h2>
+
+        {% if error %}
+        <div class="error-msg">⚠ {{ error }}</div>
+        {% endif %}
+
+        <form action="/search" method="GET">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="origin">Origin Airport</label>
+                    <div class="select-wrap">
+                        <select name="origin" id="origin" required>
+                            <option value="">Select origin…</option>
+                            {% for ap in airports %}
+                            <option value="{{ ap.airport_code }}">{{ ap.airport_code }} — {{ ap.city }}, {{ ap.country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dest">Destination Airport</label>
+                    <div class="select-wrap">
+                        <select name="dest" id="dest" required>
+                            <option value="">Select destination…</option>
+                            {% for ap in airports %}
+                            <option value="{{ ap.airport_code }}">{{ ap.airport_code }} — {{ ap.city }}, {{ ap.country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group date-row">
+                    <div>
+                        <label for="date_from">From Date</label>
+                        <input type="date" name="date_from" id="date_from" required>
+                    </div>
+                    <div>
+                        <label for="date_to">To Date</label>
+                        <input type="date" name="date_to" id="date_to" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <span class="hint">All departure times shown in GMT</span>
+                <button type="submit" class="btn">Search Flights &rarr;</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="airports-strip">
+        {% for ap in airports %}
+        <div class="airport-pill"><b>{{ ap.airport_code }}</b> {{ ap.city }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

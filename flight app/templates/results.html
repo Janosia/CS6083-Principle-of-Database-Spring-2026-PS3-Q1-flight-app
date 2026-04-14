@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Flights {{ origin }} → {{ dest }} | SkyRoute{% endblock %}
+
+{% block extra_style %}
+.page-header {
+    padding: 2.5rem 2rem 0;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--ink); }
+
+.route-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.04em;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.route-arrow {
+    color: var(--accent);
+    font-size: 1.5rem;
+}
+
+.date-range {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.results-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-count {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.result-count b { color: var(--ink); font-size: 1.1rem; }
+
+.flights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.flight-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.flight-card:hover {
+    border-color: var(--ink);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.flight-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+    min-width: 80px;
+}
+
+.flight-airline {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.flight-route {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.airport-code {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.route-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    min-width: 40px;
+}
+
+.route-line::after {
+    content: '▸';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.flight-times {
+    text-align: center;
+}
+
+.depart-time {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.duration {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.flight-date-badge {
+    text-align: right;
+}
+
+.date-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.plane-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.15rem 0.45rem;
+    margin-top: 0.25rem;
+    letter-spacing: 0.04em;
+}
+
+.view-cta {
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+}
+
+.no-results h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+}
+
+@media(max-width: 700px) {
+    .flight-card {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+    }
+    .flight-route { grid-column: 1 / -1; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="breadcrumb">
+        <a href="/">Home</a> / Search Results
+    </div>
+
+    <div class="route-title">
+        {{ origin }}
+        <span class="route-arrow">→</span>
+        {{ dest }}
+    </div>
+    <div class="date-range">{{ date_from }} &ndash; {{ date_to }} &nbsp;·&nbsp; All times in GMT</div>
+</div>
+
+<div class="container" style="padding-top:1rem;">
+    <div class="results-meta">
+        <div class="result-count">
+            <b>{{ flights|length }}</b> flight{% if flights|length != 1 %}s{% endif %} found
+        </div>
+        <a href="/" class="btn btn-outline">← New Search</a>
+    </div>
+
+    {% if flights %}
+    <div class="flights-list">
+        {% for f in flights %}
+        <a class="flight-card" href="/flight/{{ f.flight_number }}/{{ f.departure_date }}">
+            <div>
+                <div class="flight-num">{{ f.flight_number }}</div>
+                <div class="flight-airline">{{ f.airline_name }}</div>
+            </div>
+
+            <div class="flight-route">
+                <span class="airport-code">{{ f.origin_code }}</span>
+                <div class="route-line"></div>
+                <span class="airport-code">{{ f.dest_code }}</span>
+            </div>
+
+            <div class="flight-times">
+                <div class="depart-time">{{ f.departure_time }}</div>
+                <div class="duration">
+                    {% set total_minutes = (f.duration.seconds // 60) %}
+                    {% set h = total_minutes // 60 %}
+                    {% set m = total_minutes % 60 %}
+                    {{ h }}h {% if m %}{{ m }}m{% endif %}
+                </div>
+            </div>
+
+            <div class="flight-date-badge">
+                <div class="date-text">{{ f.departure_date }}</div>
+                <div class="plane-tag">{{ f.plane_type }}</div>
+            </div>
+
+            <div class="view-cta">Details →</div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="no-results">
+        <h3>No flights found</h3>
+        <p>No flights operate between <b>{{ origin }}</b> and <b>{{ dest }}</b> in the selected date range.</p>
+        <br>
+        <a href="/" class="btn">← Try Another Search</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

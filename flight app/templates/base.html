@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SkyRoute{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #0a0a0f;
+            --paper: #f5f3ee;
+            --accent: #d4521a;
+            --accent2: #1a6dd4;
+            --muted: #8a8880;
+            --border: #d6d2c8;
+            --card: #ffffff;
+            --green: #1a8c4e;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2.5rem;
+            border-bottom: 1.5px solid var(--border);
+            background: var(--paper);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--accent); }
+
+        nav small {
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            background: var(--ink);
+            color: var(--paper);
+            border: none;
+            border-radius: 4px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.01em;
+        }
+
+        .btn:hover { background: var(--accent); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--ink);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+        {% block extra_style %}{% endblock %}
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">Sky<span>Route</span></a>
+        <small>Flight Search System</small>
+    </nav>
+
+    {% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% block title %}{{ flight.flight_number }} on {{ flight.departure_date }} | SkyRoute{% endblock %}
+
+{% block extra_style %}
+.page-header {
+    padding: 2.5rem 2rem 0;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--ink); }
+
+.detail-hero {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 8px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+}
+
+.flight-id {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,243,238,0.5);
+    margin-bottom: 0.5rem;
+}
+
+.flight-headline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    letter-spacing: -0.04em;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.arrow-accent { color: var(--accent); }
+
+.airline-name {
+    color: rgba(245,243,238,0.6);
+    font-size: 0.9rem;
+}
+
+.flight-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.meta-item label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,243,238,0.4);
+    margin-bottom: 0.3rem;
+}
+
+.meta-item .val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--paper);
+}
+
+.capacity-panel {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.capacity-panel h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+}
+
+.seat-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+}
+
+.stat-box.available { border-color: var(--green); background: #f0faf5; }
+.stat-box.booked { border-color: var(--accent); background: #fef5f0; }
+
+.stat-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+}
+
+.stat-box.available .stat-number { color: var(--green); }
+.stat-box.booked .stat-number { color: var(--accent); }
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.capacity-bar-wrap {
+    margin-top: 0.5rem;
+}
+
+.capacity-bar-wrap label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.bar-track {
+    height: 10px;
+    background: #e8e5df;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transition: width 1s ease;
+}
+
+.bookings-section {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem 2.5rem;
+}
+
+.bookings-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+
+.bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.bookings-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.bookings-table td {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0ede7;
+    color: var(--ink);
+}
+
+.bookings-table tr:last-child td { border-bottom: none; }
+
+.seat-badge {
+    display: inline-block;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.15rem 0.5rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+}
+
+.no-bookings {
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+}
+
+@media(max-width:650px){
+    .detail-hero { grid-template-columns: 1fr; }
+    .flight-meta-grid { grid-template-columns: 1fr 1fr; }
+    .seat-stats { grid-template-columns: 1fr 1fr; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="breadcrumb">
+        <a href="/">Home</a> /
+        <a href="javascript:history.back()">Results</a> /
+        {{ flight.flight_number }}
+    </div>
+</div>
+
+<div class="container" style="padding-top:1rem;">
+
+    <!-- Hero card -->
+    <div class="detail-hero">
+        <div>
+            <div class="flight-id">{{ flight.airline_name }} · {{ flight.flight_number }}</div>
+            <div class="flight-headline">
+                {{ flight.origin_code }}
+                <span class="arrow-accent">→</span>
+                {{ flight.dest_code }}
+            </div>
+            <div class="airline-name">{{ flight.origin_name }}&nbsp;&nbsp;→&nbsp;&nbsp;{{ flight.dest_name }}</div>
+
+            <div class="flight-meta-grid">
+                <div class="meta-item">
+                    <label>Date</label>
+                    <div class="val">{{ flight.departure_date }}</div>
+                </div>
+                <div class="meta-item">
+                    <label>Departure (GMT)</label>
+                    <div class="val">
+                        {% set total_minutes = (flight.duration.seconds // 60) %}
+                        {% set h = total_minutes // 60 %}
+                        {% set m = total_minutes % 60 %}
+                        {{ h }}h{% if m %} {{ m }}m{% endif %}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <label>Duration</label>
+                    <div class="val">
+                        {% set total_minutes = (flight.duration.seconds // 60) %}
+                            {% set h = total_minutes // 60 %}
+                            {% set m = total_minutes % 60 %}
+                            {{ h }}h{% if m %} {{ m }}m{% endif %}
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <label>Aircraft</label>
+                    <div class="val">{{ flight.plane_type }}</div>
+                </div>
+                <div class="meta-item">
+                    <label>Origin City</label>
+                    <div class="val">{{ flight.origin_city }}</div>
+                </div>
+                <div class="meta-item">
+                    <label>Destination City</label>
+                    <div class="val">{{ flight.dest_city }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seat availability -->
+    {% set available = flight.capacity - flight.booked_seats %}
+    {% set pct = ((flight.booked_seats / flight.capacity) * 100) | round | int if flight.capacity and flight.capacity > 0 else 0 %}
+
+    <div class="capacity-panel">
+        <h2>Seat Availability</h2>
+
+        <div class="seat-stats">
+            <div class="stat-box">
+                <div class="stat-number">{{ flight.capacity }}</div>
+                <div class="stat-label">Total Seats</div>
+            </div>
+            <div class="stat-box available">
+                <div class="stat-number">{{ available }}</div>
+                <div class="stat-label">Available</div>
+            </div>
+            <div class="stat-box booked">
+                <div class="stat-number">{{ flight.booked_seats }}</div>
+                <div class="stat-label">Booked</div>
+            </div>
+        </div>
+
+        <div class="capacity-bar-wrap">
+            <label>
+                <span>Occupancy</span>
+                <span>{{ pct }}%</span>
+            </label>
+            <div class="bar-track">
+                <div class="bar-fill" style="width: {{ pct }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings list -->
+    <div class="bookings-section">
+        <h2>Current Bookings ({{ flight.booked_seats }})</h2>
+        {% if bookings %}
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Seat</th>
+                    <th>Passenger</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td><span class="seat-badge">{{ b.seat_number }}</span></td>
+                    <td>{{ b.passenger_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-bookings">No bookings yet for this flight.</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top:1.5rem;">
+        <a href="javascript:history.back()" class="btn btn-outline">← Back to Results</a>
+    </div>
+</div>
+{% endblock %}
